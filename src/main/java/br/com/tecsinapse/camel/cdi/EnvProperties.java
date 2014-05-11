@@ -35,4 +35,10 @@ public interface EnvProperties extends Config {
 
     @Key("twitter.accessTokenSecret")
     String twitterAccessTokenSecret();
+
+    @Key("email.username")
+    String emailUsername();
+
+    @Key("email.password")
+    String emailPassword();
 }

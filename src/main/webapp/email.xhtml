@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<ui:composition template="/resources/templates/template.xhtml">
+
+    <ui:define name="content">
+        <h:form>
+            <h3>Emails</h3>
+            <ui:repeat value="#{emailController.latests}" var="item">
+                <br/>
+                <h3>#{item.message.subject}</h3>
+                <h4>#{item.message.receivedDate}</h4>
+                Enviado por: #{item.message.from}<br/>
+                <h:outputText value="#{item.message.content}" escape="false" /><br/>
+            </ui:repeat>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>
