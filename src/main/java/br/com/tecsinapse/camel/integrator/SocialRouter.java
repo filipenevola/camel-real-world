@@ -20,7 +20,7 @@ public class SocialRouter extends RouteBuilder {
     @Inject
     private SocialRepository socialRepository;
 
-    private static final ImmutableList<String> TWITTERS = ImmutableList.of("TheDevConf");
+    private static final ImmutableList<String> TWITTERS = ImmutableList.of("FilipeNevola", "TheDevConf", "globalcode", "tecsinapse");
 
     @Override
     public void configure() throws Exception {
@@ -48,11 +48,8 @@ public class SocialRouter extends RouteBuilder {
     }
 
     public enum Feed {
-        WEBMOTORS("WebMotors", "http://www.webmotors.com.br/rss/sobrerodas.rss", 5),
-        EXAME_CARROS("Carros - Exame.com", "http://feeds.feedburner.com/ExameCarros", 5),
-        EXAME_ECONOMIA("Econômia - Exame.com", "http://feeds.feedburner.com/Exame-Economia", 5),
-        EXAME_NEGOCIOS("Negócios - Exame.com", "http://feeds.feedburner.com/Exame-Negocios", 5),
-        INFOMONEY_CARROS("Carros - InfoMoney.com.br", "http://www.infomoney.com.br/minhas-financas/carros/rss", 5);
+        SOUJAVA("SouJava", "http://soujava.org.br/feed/", 5),
+        JAVAWORLD("Java World", "http://www.javaworld.com/index.rss", 5);
 
         private final String title;
         private final int daysToRead;

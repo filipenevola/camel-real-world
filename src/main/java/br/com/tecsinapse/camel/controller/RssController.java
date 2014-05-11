@@ -13,8 +13,8 @@ import java.io.Serializable;
 
 @Named
 @ViewScoped
-@URLMapping(id = "twitter", pattern = "/twitter/", viewId = "/jsf/twitter.xhtml")
-public class TwitterController implements Serializable {
+@URLMapping(id = "rss", pattern = "/rss/", viewId = "/jsf/rss.xhtml")
+public class RssController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject
@@ -22,9 +22,9 @@ public class TwitterController implements Serializable {
 
     private ImmutableList<SocialContent> latests;
 
-    @URLAction(mappingId = "twitter", onPostback = false)
-    public void twitter() {
-        latests = socialRepository.getLatestsTweets(10);
+    @URLAction(mappingId = "rss", onPostback = false)
+    public void rss() {
+        latests = socialRepository.getLatestsFeeds(10);
     }
 
     public ImmutableList<SocialContent> getLatests() {

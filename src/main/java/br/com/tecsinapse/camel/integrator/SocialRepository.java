@@ -7,9 +7,11 @@ import com.google.common.collect.*;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
 import twitter4j.Status;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +30,9 @@ public class SocialRepository {
             .compare(o2, o1, Ordering.arbitrary())
             .result();
 
+    @Inject
+    private transient Logger logger;
+
     private <K, V> void arrive(K key, V value, Map<K, SortedSet<V>> map, Comparator<V> comparator) {
 
         SortedSet<V> values = map.get(key);
@@ -43,13 +48,17 @@ public class SocialRepository {
     }
 
     public void arriveTweet(Status tweet) {
+        logger.info("arriveTweet from {}", tweet.getUser().getScreenName());
         arrive(tweet.getUser().getScreenName().toLowerCase(), tweet, tweetByUser, TWEET_COMPARATOR);
     }
 
     public void arriveFeed(SocialRouter.Feed feed, SyndFeed syndFeed) {
+        logger.info("arriveFeed from {}", feed.getTitle());
+
         @SuppressWarnings("unchecked")
         final List<SyndEntry> entries = (List<SyndEntry>) syndFeed.getEntries();
         for (SyndEntry syndEntry : entries) {
+
             arrive(feed, syndEntry, rssByFeed, SYND_COMPARATOR);
         }
     }
@@ -71,20 +80,27 @@ public class SocialRepository {
     public ImmutableList<SocialContent> getLatests(int quantity) {
         SortedSet<SocialContent> contents = new TreeSet<>(Ordering.natural().<SocialContent>reverse());
 
-        contents.addAll(getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> {
-            final Status tweet = entry.getValue();
-            return new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
-                    tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT);
-        }));
+        contents.addAll(getLatestsTweets(quantity));
 
-        contents.addAll(getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> {
+        contents.addAll(getLatestsFeeds(quantity));
+
+        return FluentIterable.from(contents).limit(quantity).toList();
+    }
+
+    public ImmutableList<SocialContent> getLatestsFeeds(int quantity) {
+        return getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> {
             final SyndEntry feed = entry.getValue();
             return new SocialContent(feed.getTitle(), entry.getKey().getTitle(),
                     feed.getDescription().getValue(), localDateTimeFromDate(feed.getPublishedDate()), SocialContentType.from(feed.getDescription().getType()));
-        }));
+        });
+    }
 
-
-        return FluentIterable.from(contents).limit(quantity).toList();
+    public ImmutableList<SocialContent> getLatestsTweets(int quantity) {
+        return getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> {
+            final Status tweet = entry.getValue();
+            return new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
+                    tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT);
+        });
     }
 
     public static LocalDateTime localDateTimeFromDate(Date date) {
