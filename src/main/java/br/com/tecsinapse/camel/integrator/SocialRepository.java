@@ -55,7 +55,7 @@ public class SocialRepository {
     }
 
     private <K, V> ImmutableList<SocialContent> getLatests(
-            int quantity, Map<K, SortedSet<V>> map, final Comparator<V> comparator, Function<Entry<K, V>, SocialContent> indicadorFunction) {
+            int quantity, Map<K, SortedSet<V>> map, final Comparator<V> comparator, Function<Entry<K, V>, SocialContent> contentFunction) {
         final ImmutableList<Entry<K, V>> values = FluentIterable.from(map.entrySet())
                 .transformAndConcat(entry -> Collections2.transform(entry.getValue(), (V value) -> Maps.immutableEntry(entry.getKey(), value))).toSortedList(new Comparator<Entry<K, V>>() {
                     @Override
@@ -65,26 +65,26 @@ public class SocialRepository {
                 });
 
         return FluentIterable.from(values.subList(0, Math.min(quantity, values.size())))
-                .transform(indicadorFunction).toList();
+                .transform(contentFunction).toList();
     }
 
     public ImmutableList<SocialContent> getLatests(int quantity) {
-        SortedSet<SocialContent> indicadores = new TreeSet<>(Ordering.natural().<SocialContent>reverse());
+        SortedSet<SocialContent> contents = new TreeSet<>(Ordering.natural().<SocialContent>reverse());
 
-        indicadores.addAll(getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> {
+        contents.addAll(getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> {
             final Status tweet = entry.getValue();
             return new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
                     tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT);
         }));
 
-        indicadores.addAll(getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> {
+        contents.addAll(getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> {
             final SyndEntry feed = entry.getValue();
             return new SocialContent(feed.getTitle(), entry.getKey().getTitle(),
                     feed.getDescription().getValue(), localDateTimeFromDate(feed.getPublishedDate()), SocialContentType.from(feed.getDescription().getType()));
         }));
 
 
-        return FluentIterable.from(indicadores).limit(quantity).toList();
+        return FluentIterable.from(contents).limit(quantity).toList();
     }
 
     public static LocalDateTime localDateTimeFromDate(Date date) {
