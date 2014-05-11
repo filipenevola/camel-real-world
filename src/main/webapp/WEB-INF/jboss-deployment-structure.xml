@@ -1,0 +1,20 @@
+<jboss-deployment-structure>
+	<deployment>
+		<!-- Exclusions allow you to prevent the server from automatically adding some dependencies     -->
+		<exclusions>
+        <!-- Exclude slf4j 1.6.1, we added new module in jboss with 1.7.5 -->
+			<module name="org.apache.commons.logging" />
+			<module name="org.slf4j" />
+			<module name="org.slf4j.ext" />
+			<module name="org.slf4j.jcl-over-slf4j" />
+        <!-- Exclude slf4j-jboss-logmanager, we want to use logback that we added as a module -->
+			<module name="org.slf4j.impl" />
+			<module name="org.apache.log4j" />
+		</exclusions>
+		
+		<dependencies>
+            <module name ="javax.ws.rs.api" />
+            <module name ="org.codehaus.jackson.jackson-jaxrs" />
+		</dependencies>
+	</deployment>
+</jboss-deployment-structure>

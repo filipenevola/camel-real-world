@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+    <display-name>camel-real-world</display-name>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+	<!-- configurações de contexto -->
+	<context-param>
+		<param-name>com.sun.faces.numberOfViewsInSession</param-name>
+		<param-value>5</param-value>
+	</context-param>
+	<context-param>
+		<param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+		<param-name>org.jboss.seam.transaction.disableListener</param-name>
+		<param-value>true</param-value>
+	</context-param>
+    <context-param>
+        <param-name>CamelContextLifecycle</param-name>
+        <param-value>br.com.tecsinapse.camel.cdi.CamelLifecycle</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.apache.camel.component.servletlistener.SimpleCamelServletContextListener</listener-class>
+    </listener>
+
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>/jsf/*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>jsf/index.xhtml</welcome-file>
+	</welcome-file-list>
+</web-app>

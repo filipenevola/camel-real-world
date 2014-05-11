@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+<f:view>
+    <h:head>
+        <f:facet name="first">
+            <meta charset="utf-8"></meta>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+            <title>Camel Real World</title>
+
+            <meta name="viewport" content="width=device-width,initial-scale=1.0"></meta>
+        </f:facet>
+
+        <h:outputStylesheet name="assets/bootstrap-3.1.1/css/bootstrap.min.css" rel="stylesheet"/>
+        <ui:insert name="css">
+        </ui:insert>
+
+        <h:outputScript name="assets/bootstrap-3.1.1/js/bootstrap.min.js"/>
+
+        <ui:insert name="js"></ui:insert>
+    </h:head>
+
+    <h:body>
+        <ui:insert name="metadata">
+        </ui:insert>
+
+        <h2><pretty:link mappingId="index">Camel Real World</pretty:link></h2>
+
+        <div class="row" style="margin: 10px;">
+            <div class="col-lg-12">
+                <ul class="list-group">
+                    <li class="list-group-item"><pretty:link mappingId="twitter">Twitter</pretty:link></li>
+                    <li class="list-group-item">RSS</li>
+                    <li class="list-group-item">FTP</li>
+                    <li class="list-group-item">Email</li>
+                </ul>
+            </div>
+        </div>
+        <hr/>
+        <ui:insert name="content">
+        </ui:insert>
+
+        <hr/>
+        <a href="http://tecsinapse.com.br/" target="_blank"><img
+                src="#{request.contextPath}/resources/assets/img/powered-by-ts-3.gif" alt="TecSinapse"/></a>
+    </h:body>
+</f:view>
+</html>
