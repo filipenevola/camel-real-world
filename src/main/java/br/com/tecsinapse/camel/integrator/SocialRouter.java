@@ -48,8 +48,8 @@ public class SocialRouter extends RouteBuilder {
     }
 
     public enum Feed {
-        SOUJAVA("SouJava", "http://soujava.org.br/feed/", 5),
-        JAVAWORLD("Java World", "http://www.javaworld.com/index.rss", 5);
+        SOUJAVA("SouJava", "http://soujava.org.br/feed/", 60),
+        JAVAWORLD("Java World", "http://www.javaworld.com/index.rss", 10);
 
         private final String title;
         private final int daysToRead;

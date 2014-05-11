@@ -10,9 +10,9 @@
             <ui:repeat value="#{rssController.latests}" var="item">
                 <br/>
                 <h3>#{item.title}</h3>
-                Complement: #{item.complement}<br/>
-                Content: <h:outputText value="#{item.content}" escape="false" /><br/>
-                Date/Time: #{item.dateTime.toString('dd/MM/yyyy HH:mm')}<br/>
+                <h4>#{item.dateTime.toString('dd/MM/yyyy HH:mm')}</h4>
+                Fonte: #{item.complement}<br/>
+                <h:outputText value="#{item.content}" escape="false" /><br/>
             </ui:repeat>
         </h:form>
     </ui:define>
