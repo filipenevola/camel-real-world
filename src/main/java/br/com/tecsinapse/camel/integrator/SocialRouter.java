@@ -6,15 +6,19 @@ import com.google.common.collect.ImmutableList;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.twitter.TwitterComponent;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 @CamelRoute
 public class SocialRouter extends RouteBuilder {
 
+    @Inject
+    private transient Logger logger;
     @Inject
     private EnvProperties envProperties;
     @Inject
@@ -24,6 +28,37 @@ public class SocialRouter extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        logger.info("starting configure...");
+        configureTwitter();
+        configureFeed();
+    }
+
+    private void configureFeed() throws URISyntaxException {
+        logger.info("starting configureFeed...");
+        if(!envProperties.camelRouteFeed()) {
+            logger.info("configureFeed disabled");
+            return;
+        }
+
+        //feeds
+        for (Feed feed : Feed.values()) {
+            logger.info("starting route {}...", feed.getTitle());
+            final boolean hasQuery = !nullToEmpty(new URI(feed.getUrl()).getQuery()).trim().isEmpty();
+            fromF("rss:%ssortEntries=true&throttleEntries=false&consumer.delay=300000&lastUpdate=%s",
+                    feed.getUrl() + (hasQuery ? "&" : "?"),
+                    LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
+                    .setHeader("TsFeed", constant(feed))
+                    .bean(socialRepository, "arriveFeed(${in.header.TsFeed}, ${body})");
+        }
+    }
+
+    private void configureTwitter() {
+        logger.info("starting configureTwitter...");
+        if(!envProperties.camelRouteTwitter()) {
+            logger.info("configureTwitter disabled");
+            return;
+        }
+
         TwitterComponent tc = getContext().getComponent("twitter", TwitterComponent.class);
         tc.setAccessToken(envProperties.twitterAccessToken());
         tc.setAccessTokenSecret(envProperties.twitterAccessTokenSecret());
@@ -32,18 +67,9 @@ public class SocialRouter extends RouteBuilder {
 
         //twitter
         for (String user : TWITTERS) {
+            logger.info("starting route {}...", user);
             fromF("twitter://timeline/user?type=polling&delay=300&user=%s", user)
                     .bean(socialRepository, "arriveTweet");
-        }
-
-        //feeds
-        for (Feed feed : Feed.values()) {
-            final boolean hasQuery = !nullToEmpty(new URI(feed.getUrl()).getQuery()).trim().isEmpty();
-            fromF("rss:%ssortEntries=true&throttleEntries=false&consumer.delay=300000&lastUpdate=%s",
-                    feed.getUrl() + (hasQuery ? "&" : "?"),
-                    LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
-                    .setHeader("TsFeed", constant(feed))
-                    .bean(socialRepository, "arriveFeed(${in.header.TsFeed}, ${body})");
         }
     }
 
