@@ -1,6 +1,6 @@
 package br.com.tecsinapse.camel.controller;
 
-import br.com.tecsinapse.camel.integrator.EmailRepository;
+import br.com.tecsinapse.camel.repository.EmailRepository;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;
 import org.apache.camel.component.mail.MailMessage;

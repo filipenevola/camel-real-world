@@ -1,7 +1,7 @@
 package br.com.tecsinapse.camel.controller;
 
 import br.com.tecsinapse.camel.data.SocialContent;
-import br.com.tecsinapse.camel.integrator.SocialRepository;
+import br.com.tecsinapse.camel.repository.SocialRepository;
 import com.google.common.collect.ImmutableList;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;

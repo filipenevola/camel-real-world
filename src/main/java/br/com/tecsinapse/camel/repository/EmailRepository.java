@@ -1,4 +1,4 @@
-package br.com.tecsinapse.camel.integrator;
+package br.com.tecsinapse.camel.repository;
 
 import org.apache.camel.component.mail.MailMessage;
 import org.slf4j.Logger;

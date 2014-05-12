@@ -1,23 +1,20 @@
 package br.com.tecsinapse.camel.integrator;
 
 import br.com.tecsinapse.camel.cdi.EnvProperties;
-import com.google.common.collect.ImmutableList;
+import br.com.tecsinapse.camel.repository.SocialRepository;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.cdi.ContextName;
-import org.apache.camel.component.twitter.TwitterComponent;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
-import twitter4j.Status;
 
 import javax.inject.Inject;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 @ContextName
-public class SocialRouter extends RouteBuilder {
+public class FeedRouter extends RouteBuilder {
 
     @Inject
     private transient Logger logger;
@@ -26,17 +23,9 @@ public class SocialRouter extends RouteBuilder {
     @Inject
     private SocialRepository socialRepository;
 
-    private static final ImmutableList<String> TWITTERS = ImmutableList.of("FilipeNevola", "TheDevConf", "globalcode", "tecsinapse");
-
     @Override
     public void configure() throws Exception {
         logger.info("starting configure...");
-        configureTwitter();
-        configureFeed();
-    }
-
-    private void configureFeed() throws URISyntaxException {
-        logger.info("starting configureFeed...");
         if(!envProperties.camelRouteFeed()) {
             logger.info("configureFeed disabled");
             return;
@@ -51,27 +40,6 @@ public class SocialRouter extends RouteBuilder {
                     LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
                     .setHeader("TsFeed", constant(feed))
                     .process(e -> socialRepository.arriveFeed(e.getIn().getHeader("TsFeed", Feed.class), e.getIn().getBody(SyndFeed.class)));
-        }
-    }
-
-    private void configureTwitter() {
-        logger.info("starting configureTwitter...");
-        if(!envProperties.camelRouteTwitter()) {
-            logger.info("configureTwitter disabled");
-            return;
-        }
-
-        TwitterComponent tc = getContext().getComponent("twitter", TwitterComponent.class);
-        tc.setAccessToken(envProperties.twitterAccessToken());
-        tc.setAccessTokenSecret(envProperties.twitterAccessTokenSecret());
-        tc.setConsumerKey(envProperties.twitterConsumerKey());
-        tc.setConsumerSecret(envProperties.twitterConsumerSecret());
-
-        //twitter
-        for (String user : TWITTERS) {
-            logger.info("starting route {}...", user);
-            fromF("twitter://timeline/user?type=polling&delay=300&user=%s", user)
-                    .process(e -> socialRepository.arriveTweet(e.getIn().getBody(Status.class)));
         }
     }
 

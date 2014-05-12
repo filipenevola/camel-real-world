@@ -1,6 +1,7 @@
 package br.com.tecsinapse.camel.integrator;
 
 import br.com.tecsinapse.camel.cdi.EnvProperties;
+import br.com.tecsinapse.camel.repository.EmailRepository;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.cdi.ContextName;
 import org.slf4j.Logger;

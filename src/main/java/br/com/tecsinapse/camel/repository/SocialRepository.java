@@ -1,7 +1,8 @@
-package br.com.tecsinapse.camel.integrator;
+package br.com.tecsinapse.camel.repository;
 
 import br.com.tecsinapse.camel.data.SocialContent;
 import br.com.tecsinapse.camel.data.SocialContentType;
+import br.com.tecsinapse.camel.integrator.FeedRouter;
 import com.google.common.base.Function;
 import com.google.common.collect.*;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -19,12 +20,12 @@ import java.util.concurrent.ConcurrentMap;
 
 @ApplicationScoped
 public class SocialRepository {
-    private static final int KEEP = 10;
+    private static final int KEEP = 100;
 
     private final ConcurrentMap<String, SortedSet<Status>> tweetByUser = new ConcurrentHashMap<>();
     private static final Ordering<Status> TWEET_COMPARATOR = Ordering.natural().reverse();
 
-    private final ConcurrentMap<SocialRouter.Feed, SortedSet<SyndEntry>> rssByFeed = new ConcurrentHashMap<>();
+    private final ConcurrentMap<FeedRouter.Feed, SortedSet<SyndEntry>> rssByFeed = new ConcurrentHashMap<>();
     private static final Comparator<SyndEntry> SYND_COMPARATOR = (o1, o2) -> ComparisonChain.start()
             .compare(o2.getPublishedDate(), o1.getPublishedDate())
             .compare(o2, o1, Ordering.arbitrary())
@@ -52,7 +53,7 @@ public class SocialRepository {
         arrive(tweet.getUser().getScreenName().toLowerCase(), tweet, tweetByUser, TWEET_COMPARATOR);
     }
 
-    public void arriveFeed(SocialRouter.Feed feed, SyndFeed syndFeed) {
+    public void arriveFeed(FeedRouter.Feed feed, SyndFeed syndFeed) {
         logger.info("arriveFeed from {}", feed.getTitle());
 
         @SuppressWarnings("unchecked")
