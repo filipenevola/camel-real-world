@@ -1,12 +1,14 @@
 package br.com.tecsinapse.camel.integrator;
 
 import br.com.tecsinapse.camel.cdi.EnvProperties;
-import br.com.tecsinapse.camel.cdi.annotation.CamelRoute;
 import com.google.common.collect.ImmutableList;
+import com.sun.syndication.feed.synd.SyndFeed;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.cdi.ContextName;
 import org.apache.camel.component.twitter.TwitterComponent;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
+import twitter4j.Status;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -14,7 +16,7 @@ import java.net.URISyntaxException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-@CamelRoute
+@ContextName
 public class SocialRouter extends RouteBuilder {
 
     @Inject
@@ -48,7 +50,7 @@ public class SocialRouter extends RouteBuilder {
                     feed.getUrl() + (hasQuery ? "&" : "?"),
                     LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
                     .setHeader("TsFeed", constant(feed))
-                    .bean(socialRepository, "arriveFeed(${in.header.TsFeed}, ${body})");
+                    .process(e -> socialRepository.arriveFeed(e.getIn().getHeader("TsFeed", Feed.class), e.getIn().getBody(SyndFeed.class)));
         }
     }
 
@@ -69,7 +71,7 @@ public class SocialRouter extends RouteBuilder {
         for (String user : TWITTERS) {
             logger.info("starting route {}...", user);
             fromF("twitter://timeline/user?type=polling&delay=300&user=%s", user)
-                    .bean(socialRepository, "arriveTweet");
+                    .process(e -> socialRepository.arriveTweet(e.getIn().getBody(Status.class)));
         }
     }
 

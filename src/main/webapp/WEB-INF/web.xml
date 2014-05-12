@@ -21,13 +21,6 @@
 		<param-name>org.jboss.seam.transaction.disableListener</param-name>
 		<param-value>true</param-value>
 	</context-param>
-    <context-param>
-        <param-name>CamelContextLifecycle</param-name>
-        <param-value>br.com.tecsinapse.camel.cdi.CamelLifecycle</param-value>
-    </context-param>
-    <listener>
-        <listener-class>org.apache.camel.component.servletlistener.SimpleCamelServletContextListener</listener-class>
-    </listener>
 
 	<servlet>
 		<servlet-name>Faces Servlet</servlet-name>
