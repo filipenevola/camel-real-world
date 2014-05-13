@@ -31,6 +31,10 @@ public class SocialRepository {
             .compare(o2, o1, Ordering.arbitrary())
             .result();
 
+    private final SortedSet<Status> tweetsSearch = new TreeSet<>(TWEET_COMPARATOR);
+
+    private String keyword = "tdc2014";
+
     @Inject
     private transient Logger logger;
 
@@ -46,6 +50,11 @@ public class SocialRepository {
             final V oldest = values.last();
             values.remove(oldest);
         }
+    }
+
+    public void arriveTwitterSearchResult(Status tweet) {
+        logger.info("arriveTwitterSearchResult from {}", tweet.getUser().getScreenName());
+        tweetsSearch.add(tweet);
     }
 
     public void arriveTweet(Status tweet) {
@@ -109,5 +118,19 @@ public class SocialRepository {
             return LocalDateTime.fromDateFields(date);
         }
         return null;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void changeKeyword(String keyword) {
+        this.keyword = keyword;
+        this.tweetsSearch.clear();
+    }
+
+    public ImmutableList<SocialContent> getTweetsSearch(int quantity) {
+        return FluentIterable.from(tweetsSearch).limit(quantity).transform(tweet -> new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
+                tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT)).toList();
     }
 }

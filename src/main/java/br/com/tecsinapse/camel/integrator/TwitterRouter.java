@@ -3,9 +3,12 @@ package br.com.tecsinapse.camel.integrator;
 import br.com.tecsinapse.camel.cdi.EnvProperties;
 import br.com.tecsinapse.camel.repository.SocialRepository;
 import com.google.common.collect.ImmutableList;
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.cdi.ContextName;
 import org.apache.camel.component.twitter.TwitterComponent;
+import org.apache.camel.support.ExpressionAdapter;
 import org.slf4j.Logger;
 import twitter4j.Status;
 
@@ -26,16 +29,24 @@ public class TwitterRouter extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         logger.info("starting configure...");
-        if (!envProperties.camelRouteTwitter()) {
-            logger.info("configureTwitter disabled");
-            return;
-        }
+        configureTwitterComponent();
+        configureTimelines();
+        configureSearch();
+    }
 
+    private void configureTwitterComponent() {
         TwitterComponent tc = getContext().getComponent("twitter", TwitterComponent.class);
         tc.setAccessToken(envProperties.twitterAccessToken());
         tc.setAccessTokenSecret(envProperties.twitterAccessTokenSecret());
         tc.setConsumerKey(envProperties.twitterConsumerKey());
         tc.setConsumerSecret(envProperties.twitterConsumerSecret());
+    }
+
+    private void configureTimelines() {
+        if (!envProperties.camelRouteTwitter()) {
+            logger.info("configureTimelines disabled");
+            return;
+        }
 
         //twitter
         for (String user : TWITTERS) {
@@ -45,5 +56,27 @@ public class TwitterRouter extends RouteBuilder {
         }
     }
 
+
+    private void configureSearch() {
+        if (!envProperties.camelRouteTwitter()) {
+            logger.info("configureSearch disabled");
+            return;
+        }
+
+        //twitter
+        logger.info("starting route search {}...");
+        fromF("twitter://search?type=polling&delay=60&keywords=${in.header.KEYWORD}")
+                .setHeader("KEYWORD", getKeyword())
+                .process(e -> socialRepository.arriveTwitterSearchResult(e.getIn().getBody(Status.class)));
+    }
+
+    private Expression getKeyword() {
+        return new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return socialRepository.getKeyword();
+            }
+        };
+    }
 
 }
