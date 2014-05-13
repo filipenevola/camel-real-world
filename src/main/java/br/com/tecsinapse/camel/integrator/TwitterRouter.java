@@ -67,8 +67,7 @@ public class TwitterRouter extends RouteBuilder {
         //twitter
         logger.info("starting route search {}...");
         from("direct:twitterSearch")
-            .setHeader("CamelTwitterKeywords", getKeyword())
-            .to("twitter://search?type=polling&delay=60")
+            .to("twitter://search")
                 .process(e -> socialRepository.arriveTwitterSearchResult(e.getIn().getBody(List.class)));
     }
 
