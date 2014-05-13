@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:comp="http://java.sun.com/jsf/composite/components">
 <ui:composition template="/resources/templates/template.xhtml">
 
     <ui:define name="content">
@@ -10,11 +11,7 @@
             <h:inputText value="#{twitterController.keyword}"/>
             <h:commandLink styleClass="btn btn-primary" action="#{twitterController.search}">search</h:commandLink>
             <ui:repeat value="#{twitterController.results}" var="item">
-                <br/>
-                <h3>#{item.title}</h3>
-                <h4>#{item.dateTime.toString('dd/MM/yyyy HH:mm')}</h4>
-                Twitter: #{item.complement}<br/>
-                <h:outputText value="#{item.content}" escape="false" /><br/>
+                <comp:socialContent item="#{item}" />
             </ui:repeat>
         </h:form>
     </ui:define>

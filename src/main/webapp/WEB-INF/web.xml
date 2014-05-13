@@ -8,7 +8,6 @@
         <session-timeout>30</session-timeout>
     </session-config>
 
-	<!-- configurações de contexto -->
 	<context-param>
 		<param-name>com.sun.faces.numberOfViewsInSession</param-name>
 		<param-value>5</param-value>

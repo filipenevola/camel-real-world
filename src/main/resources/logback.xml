@@ -3,8 +3,6 @@
 	<contextName>camelRealWorld</contextName>
 	<jmxConfigurator/>
 
-    <property resource="env.properties"/>
-  
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{dd/MM/yyyy-HH:mm:ss} %-5level %logger{36}:%line %X{requestURL} - %msg%n</pattern>
@@ -27,26 +25,6 @@
 		</triggeringPolicy>
 	</appender>
 
-    <!--<if condition='property("env").contains("homolog") || property("env").contains("prod")'>-->
-        <!--<then>-->
-            <!--<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">-->
-                <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
-                    <!--&lt;!&ndash;warns serão enfilerados e notificados no primeiro proximo erro que ocorrer OnErrorEvaluator&ndash;&gt;-->
-                    <!--<level>WARN</level>-->
-                <!--</filter>-->
-                <!--<to>any@any.com.br</to>-->
-                <!--<from>erro@camelRealWorld.com.br</from>-->
-
-                <!--<subject>[CAMEL-REAL-WORLD-ERRO] - ${env} ${branch} %-5level - %logger{20}</subject>-->
-
-                <!--<sessionViaJNDI>true</sessionViaJNDI>-->
-                <!--<jndiLocation>java:jboss/mail/MandrillCamelRealWorld</jndiLocation>-->
-
-                <!--<layout class="ch.qos.logback.classic.html.HTMLLayout"/>-->
-            <!--</appender>-->
-	    <!--</then>-->
-    <!--</if>-->
-
 	<appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">		 
 		<appender-ref ref="STDOUT"/>
 		<includeCallerData>true</includeCallerData>
@@ -56,15 +34,6 @@
 		<includeCallerData>true</includeCallerData>
 	</appender>
 
-    <!--<if condition='property("env").contains("homolog") || property("env").contains("prod")'>-->
-        <!--<then>-->
-            <!--<appender name="ASYNC_EMAIL" class="ch.qos.logback.classic.AsyncAppender">-->
-                <!--<appender-ref ref="EMAIL"/>-->
-                <!--<includeCallerData>true</includeCallerData>-->
-            <!--</appender>-->
-        <!--</then>-->
-    <!--</if>-->
-	 
 	<logger name="com.googlecode.flyway" level="DEBUG" />
 	<logger name="br.com.tecsinapse" level="DEBUG" />
 
@@ -74,11 +43,5 @@
 	<root level="INFO">
 		<appender-ref ref="ASYNC_STDOUT" />
 		<appender-ref ref="ASYNC_FILE" />
-
-        <!--<if condition='property("env").contains("homolog") || property("env").contains("prod")'>-->
-            <!--<then>-->
-		        <!--<appender-ref ref="ASYNC_EMAIL" />-->
-            <!--</then>-->
-        <!--</if>-->
 	</root>
 </configuration>

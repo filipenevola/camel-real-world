@@ -1,0 +1,18 @@
+<ui:component
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:cc="http://java.sun.com/jsf/composite">
+
+    <cc:interface>
+        <cc:attribute name="item" type="br.com.tecsinapse.camel.data.SocialContent" required="true" />
+        <cc:attribute name="source" default="Fonte" />
+    </cc:interface>
+    <cc:implementation>
+        <br/>
+        <h3>#{cc.attrs.item.title}</h3>
+        <h4>#{cc.attrs.item.dateTime.toString('dd/MM/yyyy HH:mm')}</h4>
+        #{cc.attrs.source}: #{cc.attrs.item.complement}<br/>
+        <h:outputText value="#{cc.attrs.item.content}" escape="false" /><br/>
+    </cc:implementation>
+</ui:component>
