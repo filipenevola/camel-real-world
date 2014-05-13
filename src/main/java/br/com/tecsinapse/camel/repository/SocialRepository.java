@@ -31,9 +31,7 @@ public class SocialRepository {
             .compare(o2, o1, Ordering.arbitrary())
             .result();
 
-    private final SortedSet<Status> tweetsSearch = new TreeSet<>(TWEET_COMPARATOR);
-
-    private String keyword = "tdc2014";
+    private final SortedSet<Status> tweetsResults = new TreeSet<>(TWEET_COMPARATOR);
 
     @Inject
     private transient Logger logger;
@@ -54,7 +52,7 @@ public class SocialRepository {
 
     public void arriveTwitterSearchResult(List<Status> tweets) {
         logger.info("arriveTwitterSearchResult number of results {}", tweets.size());
-        tweetsSearch.addAll(tweets);
+        tweetsResults.addAll(tweets);
     }
 
     public void arriveTweet(Status tweet) {
@@ -120,17 +118,12 @@ public class SocialRepository {
         return null;
     }
 
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void changeKeyword(String keyword) {
-        this.keyword = keyword;
-        this.tweetsSearch.clear();
-    }
-
-    public ImmutableList<SocialContent> getTweetsSearch(int quantity) {
-        return FluentIterable.from(tweetsSearch).limit(quantity).transform(tweet -> new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
+    public ImmutableList<SocialContent> getTweetsResult(int quantity) {
+        return FluentIterable.from(tweetsResults).limit(quantity).transform(tweet -> new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
                 tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT)).toList();
+    }
+
+    public void clearResults() {
+        tweetsResults.clear();
     }
 }

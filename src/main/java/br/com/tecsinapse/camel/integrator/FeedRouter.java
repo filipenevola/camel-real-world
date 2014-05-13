@@ -31,7 +31,6 @@ public class FeedRouter extends RouteBuilder {
             return;
         }
 
-        //feeds
         for (Feed feed : Feed.values()) {
             logger.info("starting route {}...", feed.getTitle());
             final boolean hasQuery = !nullToEmpty(new URI(feed.getUrl()).getQuery()).trim().isEmpty();

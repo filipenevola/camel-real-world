@@ -9,7 +9,6 @@
             <h3>Twitter Search</h3>
             <h:inputText value="#{twitterController.keyword}"/>
             <h:commandLink styleClass="btn btn-primary" action="#{twitterController.search}">search</h:commandLink>
-            <h:commandLink styleClass="btn btn-danger" action="#{twitterController.refresh}">refresh</h:commandLink>
             <ui:repeat value="#{twitterController.results}" var="item">
                 <br/>
                 <h3>#{item.title}</h3>

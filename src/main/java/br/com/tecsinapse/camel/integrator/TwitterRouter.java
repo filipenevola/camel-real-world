@@ -3,12 +3,9 @@ package br.com.tecsinapse.camel.integrator;
 import br.com.tecsinapse.camel.cdi.EnvProperties;
 import br.com.tecsinapse.camel.repository.SocialRepository;
 import com.google.common.collect.ImmutableList;
-import org.apache.camel.Exchange;
-import org.apache.camel.Expression;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.cdi.ContextName;
 import org.apache.camel.component.twitter.TwitterComponent;
-import org.apache.camel.support.ExpressionAdapter;
 import org.slf4j.Logger;
 import twitter4j.Status;
 
@@ -49,7 +46,6 @@ public class TwitterRouter extends RouteBuilder {
             return;
         }
 
-        //twitter
         for (String user : TWITTERS) {
             logger.info("starting route {}...", user);
             fromF("twitter://timeline/user?type=polling&delay=300&user=%s", user)
@@ -64,20 +60,10 @@ public class TwitterRouter extends RouteBuilder {
             return;
         }
 
-        //twitter
         logger.info("starting route search {}...");
         from("direct:twitterSearch")
-            .to("twitter://search")
+                .to("twitter://search")
                 .process(e -> socialRepository.arriveTwitterSearchResult(e.getIn().getBody(List.class)));
-    }
-
-    private Expression getKeyword() {
-        return new ExpressionAdapter() {
-            @Override
-            public Object evaluate(Exchange exchange) {
-                return socialRepository.getKeyword();
-            }
-        };
     }
 
 }

@@ -3,6 +3,7 @@ package br.com.tecsinapse.camel.controller;
 import br.com.tecsinapse.camel.data.SocialContent;
 import br.com.tecsinapse.camel.repository.SocialRepository;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;
 import com.ocpsoft.pretty.faces.annotation.URLMappings;
@@ -22,13 +23,14 @@ import java.io.Serializable;
 })
 public class TwitterController implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final int MAX_TWEETS = 100;
 
     @Inject
     private SocialRepository socialRepository;
 
     @Inject
     @Uri("direct:twitterSearch")
-    private transient ProducerTemplate producer;
+    private transient ProducerTemplate twitterSearchProducer;
 
     private ImmutableList<SocialContent> latests;
     private ImmutableList<SocialContent> results;
@@ -39,19 +41,10 @@ public class TwitterController implements Serializable {
         latests = socialRepository.getLatestsTweets(10);
     }
 
-    @URLAction(mappingId = "twitter-search", onPostback = false)
-    public void twitterSearch() {
-        refresh();
-    }
-
     public void search() {
-        socialRepository.changeKeyword(keyword);
-        producer.sendBodyAndHeader(null, "CamelTwitterKeywords", keyword);
-    }
-
-    public void refresh() {
-        results = socialRepository.getTweetsSearch(10);
-        keyword = socialRepository.getKeyword();
+        socialRepository.clearResults();
+        twitterSearchProducer.sendBodyAndHeaders(null, ImmutableMap.of("CamelTwitterKeywords", keyword, "CamelTwitterCount", MAX_TWEETS));
+        results = socialRepository.getTweetsResult(MAX_TWEETS);
     }
 
     public ImmutableList<SocialContent> getLatests() {
