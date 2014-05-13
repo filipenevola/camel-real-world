@@ -11,7 +11,7 @@
             <h:inputText value="#{twitterController.keyword}"/>
             <h:commandLink styleClass="btn btn-primary" action="#{twitterController.search}">search</h:commandLink>
             <ui:repeat value="#{twitterController.results}" var="item">
-                <comp:socialContent item="#{item}" />
+                <comp:socialContent item="#{item}" source="Twitter" />
             </ui:repeat>
         </h:form>
     </ui:define>
