@@ -8,3 +8,5 @@ Para utilizar configure as propriedades no dev.properties. É necessário config
 Você pode configurar apenas uma das partes e para não receber erros por falta de configuração deixe essas rotas desativadas (false) no início deste mesmo arquivo.
 
 Bons códigos!
+
+//TODO link para a palestra
