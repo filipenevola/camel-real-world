@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import twitter4j.Status;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @ContextName
 public class TwitterRouter extends RouteBuilder {
@@ -65,9 +66,10 @@ public class TwitterRouter extends RouteBuilder {
 
         //twitter
         logger.info("starting route search {}...");
-        fromF("twitter://search?type=polling&delay=60&keywords=${in.header.KEYWORD}")
-                .setHeader("KEYWORD", getKeyword())
-                .process(e -> socialRepository.arriveTwitterSearchResult(e.getIn().getBody(Status.class)));
+        from("direct:twitterSearch")
+            .setHeader("CamelTwitterKeywords", getKeyword())
+            .to("twitter://search?type=polling&delay=60")
+                .process(e -> socialRepository.arriveTwitterSearchResult(e.getIn().getBody(List.class)));
     }
 
     private Expression getKeyword() {

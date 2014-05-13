@@ -4,6 +4,7 @@ import br.com.tecsinapse.camel.cdi.EnvProperties;
 import br.com.tecsinapse.camel.repository.EmailRepository;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.cdi.ContextName;
+import org.apache.camel.component.mail.MailMessage;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -29,9 +30,15 @@ public class EmailRouter extends RouteBuilder {
             return;
         }
 
-        fromF("imaps://imap.gmail.com?username=%s&password=%s&delete=false&unseen=true&consumer.delay=%s",
-                envProperties.emailUsername(), envProperties.emailPassword(), DELAY)
-                .process(exchange -> emailRepository.arriveEmail(exchange.getIn(org.apache.camel.component.mail.MailMessage.class)));
+        fromF("imaps://imap.gmail.com?" +
+                        "username=%s&password=%s" +
+                        "&delete=false&unseen=true" +
+                        "&consumer.delay=%s",
+                envProperties.emailUsername(),
+                envProperties.emailPassword(),
+                DELAY)
+                .process(exchange ->
+                        emailRepository.arriveEmail(exchange.getIn(MailMessage.class)));
 
     }
 }

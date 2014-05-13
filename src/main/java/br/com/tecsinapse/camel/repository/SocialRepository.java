@@ -52,9 +52,9 @@ public class SocialRepository {
         }
     }
 
-    public void arriveTwitterSearchResult(Status tweet) {
-        logger.info("arriveTwitterSearchResult from {}", tweet.getUser().getScreenName());
-        tweetsSearch.add(tweet);
+    public void arriveTwitterSearchResult(List<Status> tweets) {
+        logger.info("arriveTwitterSearchResult number of results {}", tweets.size());
+        tweetsSearch.addAll(tweets);
     }
 
     public void arriveTweet(Status tweet) {

@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;
 import com.ocpsoft.pretty.faces.annotation.URLMappings;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.cdi.Uri;
 
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -24,6 +26,10 @@ public class TwitterController implements Serializable {
     @Inject
     private SocialRepository socialRepository;
 
+    @Inject
+    @Uri("direct:twitterSearch")
+    private transient ProducerTemplate producer;
+
     private ImmutableList<SocialContent> latests;
     private ImmutableList<SocialContent> results;
     private String keyword;
@@ -40,6 +46,7 @@ public class TwitterController implements Serializable {
 
     public void search() {
         socialRepository.changeKeyword(keyword);
+        producer.sendBodyAndHeader(null, "CamelTwitterKeywords", keyword);
     }
 
     public void refresh() {
