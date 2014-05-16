@@ -2,7 +2,6 @@ package br.com.tecsinapse.camel.controller;
 
 import br.com.tecsinapse.camel.data.SocialContent;
 import br.com.tecsinapse.camel.repository.SocialRepository;
-import com.google.common.collect.ImmutableList;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;
 
@@ -10,6 +9,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.util.List;
 
 @Named
 @ViewScoped
@@ -20,14 +20,14 @@ public class TwitterAndRssController implements Serializable {
     @Inject
     private SocialRepository socialRepository;
 
-    private ImmutableList<SocialContent> latests;
+    private List<SocialContent> latests;
 
     @URLAction(mappingId = "twitter-rss", onPostback = false)
     public void twitter() {
         latests = socialRepository.getLatests(100);
     }
 
-    public ImmutableList<SocialContent> getLatests() {
+    public List<SocialContent> getLatests() {
         return latests;
     }
 }

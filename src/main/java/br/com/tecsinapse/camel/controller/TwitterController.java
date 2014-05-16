@@ -2,7 +2,6 @@ package br.com.tecsinapse.camel.controller;
 
 import br.com.tecsinapse.camel.data.SocialContent;
 import br.com.tecsinapse.camel.repository.SocialRepository;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.ocpsoft.pretty.faces.annotation.URLAction;
 import com.ocpsoft.pretty.faces.annotation.URLMapping;
@@ -14,6 +13,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.util.List;
 
 @Named
 @ViewScoped
@@ -32,8 +32,8 @@ public class TwitterController implements Serializable {
     @Uri("direct:twitterSearch")
     private transient ProducerTemplate twitterSearchProducer;
 
-    private ImmutableList<SocialContent> latests;
-    private ImmutableList<SocialContent> results;
+    private List<SocialContent> latests;
+    private List<SocialContent> results;
     private String keyword;
 
     @URLAction(mappingId = "twitter", onPostback = false)
@@ -47,7 +47,7 @@ public class TwitterController implements Serializable {
         results = socialRepository.getTweetsResult(MAX_TWEETS);
     }
 
-    public ImmutableList<SocialContent> getLatests() {
+    public List<SocialContent> getLatests() {
         return latests;
     }
 
@@ -59,7 +59,7 @@ public class TwitterController implements Serializable {
         this.keyword = keyword;
     }
 
-    public ImmutableList<SocialContent> getResults() {
+    public List<SocialContent> getResults() {
         return results;
     }
 }

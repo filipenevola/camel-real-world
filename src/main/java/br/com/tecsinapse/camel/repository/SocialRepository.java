@@ -1,13 +1,10 @@
 package br.com.tecsinapse.camel.repository;
 
 import br.com.tecsinapse.camel.data.SocialContent;
-import br.com.tecsinapse.camel.data.SocialContentType;
 import br.com.tecsinapse.camel.integrator.FeedRouter;
-import com.google.common.base.Function;
 import com.google.common.collect.*;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import twitter4j.Status;
 
@@ -17,6 +14,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class SocialRepository {
@@ -71,56 +70,44 @@ public class SocialRepository {
         }
     }
 
-    private <K, V> ImmutableList<SocialContent> getLatests(
+    private <K, V> List<SocialContent> getLatests(
             int quantity, Map<K, SortedSet<V>> map, final Comparator<V> comparator, Function<Entry<K, V>, SocialContent> contentFunction) {
-        final ImmutableList<Entry<K, V>> values = FluentIterable.from(map.entrySet())
-                .transformAndConcat(entry -> Collections2.transform(entry.getValue(), (V value) -> Maps.immutableEntry(entry.getKey(), value))).toSortedList(new Comparator<Entry<K, V>>() {
+        final List<Entry<K, V>> values = FluentIterable.from(map.entrySet())
+                .transformAndConcat(entry -> Collections2
+                        .transform(entry.getValue(), (V value) -> Maps.immutableEntry(entry.getKey(), value)))
+                .toSortedList(new Comparator<Entry<K, V>>() {
                     @Override
                     public int compare(Entry<K, V> o1, Entry<K, V> o2) {
                         return comparator.compare(o1.getValue(), o2.getValue());
                     }
                 });
 
-        return FluentIterable.from(values.subList(0, Math.min(quantity, values.size())))
-                .transform(contentFunction).toList();
+        return values.subList(0, Math.min(quantity, values.size())).stream().map(contentFunction).collect(Collectors.toList());
     }
 
-    public ImmutableList<SocialContent> getLatests(int quantity) {
+    public List<SocialContent> getLatests(int quantity) {
         SortedSet<SocialContent> contents = new TreeSet<>(Ordering.natural().<SocialContent>reverse());
 
         contents.addAll(getLatestsTweets(quantity));
 
         contents.addAll(getLatestsFeeds(quantity));
 
-        return FluentIterable.from(contents).limit(quantity).toList();
+        return contents.stream().limit(quantity).collect(Collectors.toList());
     }
 
-    public ImmutableList<SocialContent> getLatestsFeeds(int quantity) {
-        return getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> {
-            final SyndEntry feed = entry.getValue();
-            return new SocialContent(feed.getTitle(), entry.getKey().getTitle(),
-                    feed.getDescription().getValue(), localDateTimeFromDate(feed.getPublishedDate()), SocialContentType.from(feed.getDescription().getType()));
-        });
+    public List<SocialContent> getLatestsFeeds(int quantity) {
+        return getLatests(quantity, rssByFeed, SYND_COMPARATOR, entry -> SocialContent.from(entry));
     }
 
-    public ImmutableList<SocialContent> getLatestsTweets(int quantity) {
-        return getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> {
-            final Status tweet = entry.getValue();
-            return new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
-                    tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT);
-        });
+    public List<SocialContent> getLatestsTweets(int quantity) {
+        return getLatests(quantity, tweetByUser, TWEET_COMPARATOR, entry -> SocialContent.from(entry.getValue()));
     }
 
-    public static LocalDateTime localDateTimeFromDate(Date date) {
-        if (date != null) {
-            return LocalDateTime.fromDateFields(date);
-        }
-        return null;
-    }
-
-    public ImmutableList<SocialContent> getTweetsResult(int quantity) {
-        return FluentIterable.from(tweetsResults).limit(quantity).transform(tweet -> new SocialContent(tweet.getUser().getName(), "@" + tweet.getUser().getScreenName(),
-                tweet.getText(), localDateTimeFromDate(tweet.getCreatedAt()), SocialContentType.TEXT)).toList();
+    public List<SocialContent> getTweetsResult(int quantity) {
+        return tweetsResults
+                .stream()
+                .limit(quantity)
+                .map(tweet -> SocialContent.from(tweet)).collect(Collectors.toList());
     }
 
     public void clearResults() {

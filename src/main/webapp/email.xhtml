@@ -10,9 +10,8 @@
             <ui:repeat value="#{emailController.latests}" var="item">
                 <br/>
                 <h3>#{item.message.subject}</h3>
-                <h4>#{item.message.receivedDate}</h4>
-                Enviado por: #{item.message.from}<br/>
-                <h:outputText value="#{item.message.content}" escape="false" /><br/>
+                <h4>#{emailController.getDate(item.message.receivedDate)}</h4>
+                Enviado por: #{emailController.getFrom(item.message.from)}<br/>
             </ui:repeat>
         </h:form>
     </ui:define>
