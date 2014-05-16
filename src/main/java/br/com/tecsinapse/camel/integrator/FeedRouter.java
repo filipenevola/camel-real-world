@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -31,15 +33,25 @@ public class FeedRouter extends RouteBuilder {
             return;
         }
 
-        for (Feed feed : Feed.values()) {
+        Arrays.asList(Feed.values()).forEach( feed -> {
             logger.info("starting route {}...", feed.getTitle());
-            final boolean hasQuery = !nullToEmpty(new URI(feed.getUrl()).getQuery()).trim().isEmpty();
+
             fromF("rss:%ssortEntries=true&throttleEntries=false&consumer.delay=300000&lastUpdate=%s",
-                    feed.getUrl() + (hasQuery ? "&" : "?"),
-                    LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
+                feed.getUrl() + (feedHasQuery(feed) ? "&" : "?"),
+                LocalDateTime.now().minusDays(feed.getDaysToRead()).toString("yyyy-MM-dd'T'HH:mm:ss"))
                     .setHeader("TsFeed", constant(feed))
                     .process(e -> socialRepository.arriveFeed(e.getIn().getHeader("TsFeed", Feed.class), e.getIn().getBody(SyndFeed.class)));
+        });
+    }
+
+    private boolean feedHasQuery(Feed feed) {
+        boolean hasQuery = false;
+        try {
+            hasQuery = !nullToEmpty(new URI(feed.getUrl()).getQuery()).trim().isEmpty();
+        } catch (URISyntaxException e) {
+            logger.error("Erro ao criar URI para o feed {}", feed.getTitle(), e);
         }
+        return hasQuery;
     }
 
     public enum Feed {

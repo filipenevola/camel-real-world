@@ -46,11 +46,11 @@ public class TwitterRouter extends RouteBuilder {
             return;
         }
 
-        for (String user : TWITTERS) {
+        TWITTERS.forEach( user -> {
             logger.info("starting route {}...", user);
             fromF("twitter://timeline/user?type=polling&delay=300&user=%s", user)
                     .process(e -> socialRepository.arriveTweet(e.getIn().getBody(Status.class)));
-        }
+        });
     }
 
 

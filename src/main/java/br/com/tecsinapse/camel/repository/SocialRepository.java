@@ -64,10 +64,9 @@ public class SocialRepository {
 
         @SuppressWarnings("unchecked")
         final List<SyndEntry> entries = (List<SyndEntry>) syndFeed.getEntries();
-        for (SyndEntry syndEntry : entries) {
 
-            arrive(feed, syndEntry, rssByFeed, SYND_COMPARATOR);
-        }
+        entries.forEach(syndEntry ->
+                arrive(feed, syndEntry, rssByFeed, SYND_COMPARATOR));
     }
 
     private <K, V> List<SocialContent> getLatests(
