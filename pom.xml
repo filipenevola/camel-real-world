@@ -7,7 +7,7 @@
     <properties>
         <java.version>1.8</java.version>
 
-        <wildfly.version>8.0.0.Final</wildfly.version>
+        <wildfly.version>8.1.0.CR1</wildfly.version>
 
         <rewrite.version>2.0.11.Final</rewrite.version>
 
@@ -113,15 +113,6 @@
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!--https://github.com/omnifaces/omnifaces/pull/12-->
-        <!--https://github.com/omnifaces/omnifaces/commit/68dbbb918cd09fb15a1de4298b1839f4087e23ac-->
-        <!--Usar versão 1.8 ao sair-->
-        <dependency>
-            <groupId>org.omnifaces</groupId>
-            <artifactId>ts-omnifaces</artifactId>
-            <version>1.7</version>
         </dependency>
 
         <dependency>
